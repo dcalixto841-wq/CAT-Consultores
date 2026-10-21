@@ -152,6 +152,17 @@
   .faq-group{ margin-bottom:14px; }
   .faq-group:last-child{ margin-bottom:0; }
   .faq-group-title{ font-size:12px; font-weight:700; color:var(--brand-blue); margin-bottom:6px; }
+
+  details.id-guide{ margin:14px 0 4px; border:1px solid var(--brand-blue); border-radius:10px; background:var(--brand-blue-bg); }
+  details.id-guide > summary{ cursor:pointer; padding:11px 14px; font-size:13.5px; font-weight:700; color:var(--brand-blue); }
+  details.id-guide .id-body{ padding:2px 16px 14px; font-size:12.5px; line-height:1.55; color:var(--ink-soft); }
+  details.id-guide h4{ margin:14px 0 5px; font-size:12.5px; color:var(--brand-blue); }
+  details.id-guide ul, details.id-guide ol{ margin:4px 0; padding-left:18px; }
+  details.id-guide blockquote{ margin:5px 0; padding:6px 10px; border-left:3px solid var(--brand-green); background:#fff; border-radius:0 6px 6px 0; font-style:italic; }
+  details.id-guide table{ border-collapse:collapse; width:100%; margin:5px 0; background:#fff; }
+  details.id-guide th, details.id-guide td{ border:1px solid var(--line-soft); padding:5px 8px; text-align:left; vertical-align:top; }
+  details.id-guide th{ background:var(--brand-blue-bg); }
+  @media print{ details.id-guide{ display:none; } }
   details.faq-item{ border:1px solid var(--line-soft); border-radius:8px; padding:8px 12px; margin-bottom:6px; }
   details.faq-item summary{ font-size:13px; font-weight:600; cursor:pointer; }
   details.faq-item p{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; margin:8px 0 2px; }
@@ -247,6 +258,103 @@ function renderSidebar(){
   sidebar.querySelectorAll(".prod-btn").forEach(btn => {
     btn.addEventListener("click", () => { activeId = btn.dataset.id; renderSidebar(); renderMain(); });
   });
+}
+
+
+function idGuideHtml(p){
+  const esPliis = p.id === "pliis";
+  const dato2 = esPliis ? "su <b>número de empleado</b>" : "su <b>número de membresía</b>";
+  const preg2 = esPliis ? "¿Cuál es su <b>número de empleado</b>?" : "¿Cuál es su <b>número de membresía</b>?";
+  const regla2 = esPliis ? "En PLIIS <b>no se usa número de membresía</b>: solo número de empleado." : "Se pide nombre completo y número de membresía.";
+  const speech2 = esPliis ? "" : `
+      <p><b>Cómo pedir el número de membresía:</b> son <b>16 dígitos</b>.</p>
+      <blockquote>«¿Me puede indicar su número de membresía? Son 16 dígitos. Puede dármelo de cuatro en cuatro para anotarlo bien.»</blockquote>
+      <ul>
+        <li>Repítelo en voz alta de cuatro en cuatro y pídele que confirme: «¿Es correcto?»</li>
+        <li>Si te da <b>menos o más de 16 dígitos</b>: «Me hace falta confirmar el número, la membresía tiene 16 dígitos. ¿Lo revisa conmigo, por favor?»</li>
+        <li>Si no lo tiene a la mano: «No se preocupe, con su nombre completo también puedo buscarlo.»</li>
+      </ul>`;
+  const probar2 = esPliis
+    ? "<tr><td>Número de empleado</td><td>Ceros de más o de menos, un dígito cambiado</td></tr>"
+    : "<tr><td>Número de membresía (16 dígitos)</td><td>Cuenta los dígitos que te dio; si son 15 o 17, pide que lo repita de cuatro en cuatro. Busca por los últimos dígitos o por una parte del número</td></tr>";
+  return `
+  <details class="id-guide">
+    <summary>📞 Guía de identificación del usuario — leer al inicio de la llamada</summary>
+    <div class="id-body">
+      <p>La línea de Atención a Clientes es <b>compartida por todas las campañas</b>: el usuario puede no saber de qué programa es. Identifícalo sin hacerlo sentir en un trámite. ${regla2}</p>
+
+      <h4>1. Saludo (según la hora)</h4>
+      <ul><li>Hasta las 11:59: «Buenos días» · 12:00 a 19:00: «Buenas tardes» · después de las 19:00: «Buenas noches»</li></ul>
+      <blockquote>«[Buenos días], línea de atención a clientes, le atiende [nombre]. ¿En qué le puedo ayudar?»</blockquote>
+      <p><b>No decir</b> el nombre de la empresa en el saludo: el usuario puede pensar que marcó mal.</p>
+
+      <h4>2. Escuchar el motivo</h4>
+      <p>Deja que explique para qué llama y responde breve: «Claro, con gusto le apoyo.» Después identifícalo.</p>
+
+      <h4>3. Identificar al usuario (en este orden)</h4>
+      <ol>
+        <li>Nombre completo: <i>«Para ubicar su servicio, ¿me indica su nombre completo, por favor?»</i></li>
+        <li>${preg2}</li>
+      </ol>${speech2}
+      <p>Si no sabe de qué programa es:</p>
+      <ul>
+        <li>«¿Sabe el <b>nombre de la membresía o el programa</b> con el que cuenta?»</li>
+        <li>«¿Con qué empresa o institución lo obtuvo?»</li>
+      </ul>
+
+      <h4>4. Si lo encuentras</h4>
+      <blockquote>«Lo ubiqué en [programa], ¿es correcto? Perfecto, con gusto le explico.»</blockquote>
+      <p>Valida la <b>vigencia</b> en el sistema antes de dar coberturas, pagos o cancelaciones.</p>
+
+      <h4>5. Si NO lo encuentras</h4>
+      <p>Antes de concluir nada, revisa tú:</p>
+      <table>
+        <tr><th>Dato</th><th>Qué probar</th></tr>
+        <tr><td>Nombre</td><td>Apellidos primero, solo un apellido, nombre + un apellido, variantes de escritura (José/Jose, Ma./María)</td></tr>
+        ${probar2}
+      </table>
+      <p>Si sigue sin aparecer, pídele que repita el dato:</p>
+      <ul>
+        <li>«Permítame revisarlo de nuevo, ¿me repite ${dato2} dígito por dígito?»</li>
+        <li>«¿Me ayuda a deletrear su apellido, por favor?»</li>
+      </ul>
+      <p>Después, pide más información:</p>
+      <ul>
+        <li>«Con ese dato no lo ubico, ¿me comparte su correo para buscarlo de otra forma?»</li>
+        <li>«¿Me indica el <b>nombre de la membresía o el programa</b> con el que cuenta?»</li>
+        <li>«¿<b>Cuándo activó su membresía</b> o desde cuándo le dieron de alta en el programa?»</li>
+      </ul>
+
+      <h4>6. Posibles causas</h4>
+      <ul>
+        <li>Membresía nueva que aún no se carga (ej.: DONDE se activa dentro de las 4 horas siguientes al pago).</li>
+        <li>Usuario dado de baja o vencido.</li>
+        <li>Pertenece a otra campaña distinta a la que cree.</li>
+        <li>Dato mal capturado en la base.</li>
+      </ul>
+
+      <h4>7. Si sigue sin estar en base</h4>
+      <blockquote>«No lo localizo con estos datos. Voy a levantar su caso con mi supervisor para validarlo y le damos seguimiento. ¿Me confirma su nombre completo y un teléfono de contacto?»</blockquote>
+      <p><b>Registrar siempre todos los datos que comparta:</b> nombre, correo, teléfono, número de membresía, cuenta o campaña que dice tener, fecha de alta o pago y motivo de la llamada. Luego escala con el supervisor.</p>
+
+      <h4>8. Urgencias</h4>
+      <p><b>Esta cabina no atiende urgencias.</b> Si el usuario reporta una urgencia, indícale que se comunique de inmediato a la línea de asistencias de su programa (la que corresponde a su campaña en las opciones del IVR).</p>
+
+      <h4>9. Si quien llama no es el titular</h4>
+      <blockquote>«¿Usted es el titular o llama en nombre de alguien más? ¿Me indica su nombre y su parentesco con el titular?»</blockquote>
+      <p>Esto define si aplica la cobertura (titular, cónyuge, hijos, etc.).</p>
+
+      <h4>10. Qué decir y qué NO decir</h4>
+      <table>
+        <tr><th>✅ Decir</th><th>❌ No decir</th></tr>
+        <tr><td>«No lo localizo con ese dato»</td><td>«No existe», «no está registrado»</td></tr>
+        <tr><td>«Permítame revisarlo con más detalle»</td><td>«Está mal su número»</td></tr>
+        <tr><td>«Voy a pedir apoyo a mi supervisor»</td><td>«No tiene servicio»</td></tr>
+        <tr><td>«Le damos seguimiento»</td><td>Prometer cobertura sin validar</td></tr>
+      </table>
+      <p><b>Nunca:</b> dar coberturas, precios, pagos o cancelaciones antes de validar identidad y vigencia · dar datos del servicio a quien no sea el titular sin confirmar su relación · dejar al usuario sin una siguiente acción (siempre debe quedar con seguimiento o con la línea correcta).</p>
+    </div>
+  </details>`;
 }
 
 function renderMain(){
@@ -371,6 +479,7 @@ function renderMain(){
           <button class="action-btn" id="printBtn">🖨 Vista imprimible</button>
         </div>
       </div>
+      ${idGuideHtml(p)}
       <section class="block">
         <div class="block-head"><span class="block-title" style="color:${p.color}">Cuentas y teléfonos</span></div>
         ${cuentasHtml}
